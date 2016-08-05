@@ -12,7 +12,7 @@ class User < ApplicationRecord
     format: { with: VALID_EMAIL_REGEX }, uniqueness: { case_sensitive: false },  on: :create
 
   has_secure_password
-  validates :password, presence: true, length: { minimum: 6 }
+  validates :password, presence: true, length: { minimum: 6 }, allow_nil: true
 
   # 为了持久保存会话，在数据库中记住用户
   def remember
