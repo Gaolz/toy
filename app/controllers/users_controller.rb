@@ -7,13 +7,14 @@ class UsersController < ApplicationController
   # GET /users
   # GET /users.json
   def index
-    @users = User.paginate(page: params[:page])
+    @users = User.where(activated: true).paginate(page: params[:page])
   end
 
   # GET /users/1
   # GET /users/1.json
   def show
     @micropost = @user.microposts.first
+    redirect_to root_url and return unless @user.activated?
   end
 
   # GET /users/new
