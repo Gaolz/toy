@@ -1,8 +1,9 @@
 class User < ApplicationRecord
 
-  attr_accessor :remember_token
+  attr_accessor :remember_token, :activation_token
 
-  before_save { email.downcase! }
+  before_save :downcase_email
+  before_create :create_activation_digest
 
   has_many :microposts
 
@@ -21,9 +22,10 @@ class User < ApplicationRecord
   end
 
   # 如果指定的令牌和摘要匹配，返回 true
-  def authenticated?(remember_token)
-    return false if remember_digest.nil?
-    BCrypt::Password.new(remember_digest).is_password? remember_token
+  def authenticated?(attribute, token)
+    digest = send("#{attribute}_digest")
+    return false if digest.nil?
+    BCrypt::Password.new(digest).is_password? token 
   end
 
   # 忘记用户
@@ -41,4 +43,28 @@ class User < ApplicationRecord
   def self.new_token
     SecureRandom.urlsafe_base64
   end
+
+  # 激活账户
+  def activate
+    update_attribute(:activated, true)
+    update_attribute(:activated_at, Time.current)
+  end
+
+  # 发送激活邮件
+  def send_activation_email
+    UserMailer.account_activation(self).deliver_now
+  end
+
+  private
+    
+    # 电子邮件小写化
+    def downcase_email
+      self.email = email.downcase
+    end
+
+    # 创建并赋值激活令牌和摘要
+    def create_activation_digest
+      self.activation_token = User.new_token
+      self.activation_digest = User.digest(activation_token)
+    end
 end
