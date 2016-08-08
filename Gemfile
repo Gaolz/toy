@@ -27,6 +27,7 @@ group :development do
   gem 'listen', '3.0.8'
   gem 'spring',  '1.7.1'
   gem 'spring-watcher-listen', '2.0.0'
+  gem 'rubycritic', '2.9.2', require: false
 end
 
 group :test do
