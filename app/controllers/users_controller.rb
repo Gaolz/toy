@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_action :logged_in_user, only: [:index, :edit, :update, :destroy]
+  before_action :logged_in_user, only: [:index, :edit, :update, :destroy, :following, :followers]
   before_action :set_user, only: [:show, :edit, :update, :destroy]
   before_action :correct_user, only: [:edit, :update]
   before_action :admin_user, only: :destroy
@@ -14,7 +14,7 @@ class UsersController < ApplicationController
   # GET /users/1.json
   def show
     @microposts = @user.microposts.paginate(page: params[:page])
-    redirect_to root_url and return unless @user.activated?
+    (redirect_to root_url and return) unless @user.activated?
   end
 
   # GET /users/new
@@ -66,6 +66,20 @@ class UsersController < ApplicationController
       format.html { redirect_to users_url, notice: 'User was successfully destroyed.' }
       format.json { head :no_content }
     end
+  end
+
+  def following
+    @title = "Following"
+    @user = User.find(params[:id])
+    @users = @user.following.paginate(page: params[:page])
+    render "show_follow"
+  end
+
+  def followers
+    @title = "Followers"
+    @user = User.find(params[:id])
+    @users = @user.followers.paginate(page: params[:page])
+    render "show_follow"
   end
 
   private
